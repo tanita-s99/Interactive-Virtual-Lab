@@ -1,0 +1,1922 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ห้องปฏิบัติการเคมีจำลอง ม.3: ปฏิกิริยาเคมีในชีวิตประจำวัน</title>
+  <!-- โหลดฟอนต์ภาษาไทยแบบมีหัว Sarabun เพื่อให้อ่านง่ายและชัดเจนบนจอโปรเจกเตอร์ -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <!-- โหลด Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sarabun: ['Sarabun', 'sans-serif'],
+          },
+          colors: {
+            lab: {
+              bg: '#0f172a',
+              panel: '#1e293b',
+              card: '#f8fafc',
+              accent: '#0284c7',
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    /* บังคับใช้ฟอนต์ Sarabun (มีหัว) ทุกองค์ประกอบเพื่อความคมชัดสูงสุดบนจอใหญ่ */
+    * {
+      font-family: 'Sarabun', sans-serif !important;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #0b1120;
+      color: #f8fafc;
+      overflow-x: hidden;
+    }
+
+    /* เอฟเฟกต์ปุ่มนูน 3 มิติ กดง่าย สะดุดตา */
+    .btn-lab {
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 5px 0 rgba(0, 0, 0, 0.35);
+    }
+    .btn-lab:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 7px 0 rgba(0, 0, 0, 0.35);
+    }
+    .btn-lab:active:not(:disabled) {
+      transform: translateY(3px);
+      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
+    }
+    .btn-lab:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    /* ปรับแต่ง Range Slider ขนาดใหญ่สำหรับครูเลื่อนบนจอสัมผัสหรือเมาส์ */
+    input[type="range"].lab-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 18px;
+      border-radius: 999px;
+      background: #334155;
+      outline: none;
+      border: 2px solid #64748b;
+    }
+    input[type="range"].lab-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: #f59e0b;
+      border: 4px solid #ffffff;
+      cursor: pointer;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.5);
+    }
+    input[type="range"].lab-slider::-moz-range-thumb {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: #f59e0b;
+      border: 4px solid #ffffff;
+      cursor: pointer;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.5);
+    }
+
+    /* แอนิเมชันเตือนระเบิด */
+    @keyframes pulseWarning {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.06); }
+    }
+    .animate-warning {
+      animation: pulseWarning 1.2s infinite ease-in-out;
+    }
+
+    /* แอนิเมชันปรากฏตัวนุ่มนวล */
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+      animation: fadeSlideUp 0.3s ease-out forwards;
+    }
+
+    /* ซ่อน Scrollbar ที่ไม่จำเป็นแต่ยังเลื่อนได้หากจอเล็ก */
+    .custom-scroll::-webkit-scrollbar {
+      width: 8px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: #1e293b;
+      border-radius: 8px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #475569;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between select-none">
+
+  <!-- ==================== แถบนำทางด้านบน (TOP HEADER) ==================== -->
+  <header class="bg-slate-900 border-b-4 border-sky-500 px-4 py-3 shadow-xl z-20">
+    <div class="max-w-[1600px] mx-auto flex flex-wrap items-center justify-between gap-3">
+      <!-- ชื่อบทเรียน -->
+      <div class="flex items-center gap-3">
+        <div class="bg-sky-500 text-slate-950 p-2.5 rounded-2xl shadow-lg flex items-center justify-center">
+          <!-- ไอคอนขวดทดลอง SVG -->
+          <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M9 3h6M10 3v6.5L4.5 19a1.5 1.5 0 0 0 1.3 2.25h12.4A1.5 1.5 0 0 0 19.5 19L14 9.5V3" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M7.5 15h9" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div>
+          <span class="inline-block bg-amber-400 text-slate-950 text-xs sm:text-sm font-extrabold px-2.5 py-0.5 rounded-full tracking-wide">
+            วิทยาศาสตร์ ม.3 • ห้องปฏิบัติการเสมือนจริง
+          </span>
+          <h1 class="text-xl sm:text-2xl lg:text-3xl font-extrabold text-white tracking-tight leading-tight">
+            ปฏิกิริยาเคมีในชีวิตประจำวัน
+          </h1>
+        </div>
+      </div>
+
+      <!-- ปุ่มเลือกฐานการทดลองทั้ง 3 ฐาน -->
+      <nav class="flex flex-wrap items-center gap-2" aria-label="เลือกฐานการทดลอง">
+        <button id="tab-1" onclick="switchStation(1)" class="btn-lab px-4 py-2.5 rounded-2xl font-extrabold text-base sm:text-lg flex items-center gap-2 bg-sky-500 text-slate-950 ring-4 ring-white">
+          <span class="bg-slate-950 text-white w-7 h-7 rounded-full inline-flex items-center justify-center text-sm">1</span>
+          <span>โลหะ + น้ำ</span>
+          <span id="badge-done-1" class="hidden text-emerald-950 bg-emerald-300 px-1.5 py-0.2 rounded-full text-xs">✓</span>
+        </button>
+
+        <button id="tab-2" onclick="switchStation(2)" class="btn-lab px-4 py-2.5 rounded-2xl font-extrabold text-base sm:text-lg flex items-center gap-2 bg-slate-800 text-slate-200 hover:bg-slate-700 border-2 border-slate-600">
+          <span class="bg-slate-600 text-white w-7 h-7 rounded-full inline-flex items-center justify-center text-sm">2</span>
+          <span>โลหะ + กรด</span>
+          <span id="badge-done-2" class="hidden text-emerald-950 bg-emerald-300 px-1.5 py-0.2 rounded-full text-xs">✓</span>
+        </button>
+
+        <button id="tab-3" onclick="switchStation(3)" class="btn-lab px-4 py-2.5 rounded-2xl font-extrabold text-base sm:text-lg flex items-center gap-2 bg-slate-800 text-slate-200 hover:bg-slate-700 border-2 border-slate-600">
+          <span class="bg-slate-600 text-white w-7 h-7 rounded-full inline-flex items-center justify-center text-sm">3</span>
+          <span>การเกิดสนิม</span>
+          <span id="badge-done-3" class="hidden text-emerald-950 bg-emerald-300 px-1.5 py-0.2 rounded-full text-xs">✓</span>
+        </button>
+
+        <button id="tab-summary" onclick="openSummaryModal()" class="btn-lab px-4 py-2.5 rounded-2xl font-extrabold text-base sm:text-lg flex items-center gap-2 bg-purple-600 text-white hover:bg-purple-500 border-2 border-purple-400">
+          <span>🏆 สรุปผลทั้งห้อง</span>
+        </button>
+      </nav>
+
+      <!-- คะแนนดาวของห้องเรียน และ ปุ่มเปิด/ปิดเสียง -->
+      <div class="flex items-center gap-3">
+        <div class="bg-slate-800 border-2 border-amber-400 px-4 py-2 rounded-2xl flex items-center gap-2 shadow-inner">
+          <span class="text-2xl">⭐</span>
+          <div>
+            <div class="text-xs text-amber-300 font-bold leading-none">ดาวของห้องเรียน</div>
+            <div class="text-xl font-extrabold text-white leading-tight"><span id="star-count">0</span> / 3 ดวง</div>
+          </div>
+        </div>
+
+        <button id="sound-toggle-btn" onclick="toggleSound()" class="btn-lab bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2.5 rounded-2xl font-extrabold text-base flex items-center gap-2 border-2 border-emerald-300" title="เปิดหรือปิดเสียงเอฟเฟกต์">
+          <span id="sound-icon" class="text-xl">🔊</span>
+          <span id="sound-label" class="hidden sm:inline">เปิดเสียง</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== พื้นที่หลัก (MAIN 16:9 WORKSPACE) ==================== -->
+  <main class="flex-1 max-w-[1600px] w-full mx-auto p-3 sm:p-4 grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
+    
+    <!-- ด้านซ้าย: พื้นที่จำลองห้องทดลอง (HTML5 Canvas) 7 ส่วน -->
+    <section class="lg:col-span-7 bg-slate-900 rounded-3xl border-4 border-slate-700 shadow-2xl flex flex-col overflow-hidden relative min-h-[420px] lg:min-h-[600px]">
+      <!-- แถบสถานะด้านบนของพื้นที่ทดลอง -->
+      <div class="bg-slate-800/90 px-4 py-2.5 border-b-2 border-slate-700 flex flex-wrap items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <span class="w-3.5 h-3.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <h2 id="canvas-station-title" class="text-lg sm:text-xl font-extrabold text-sky-300">
+            ฐานที่ 1: ปฏิกิริยาเคมีระหว่างโลหะกับน้ำ
+          </h2>
+        </div>
+        <!-- ป้ายเตือนพิเศษสำหรับฐานที่ 1 (ระเบิดได้) -->
+        <div id="danger-badge" class="animate-warning bg-red-600 text-white px-3.5 py-1 rounded-full font-extrabold text-sm sm:text-base flex items-center gap-1.5 shadow-lg border-2 border-yellow-300">
+          <span>⚠️</span>
+          <span>ข้อควรระวัง: ระเบิดได้!</span>
+        </div>
+      </div>
+
+      <!-- Canvas จำลองอุปกรณ์วิทยาศาสตร์ -->
+      <div id="canvas-wrapper" class="relative flex-1 w-full h-full bg-gradient-to-b from-slate-900 via-slate-800 to-slate-950">
+        <canvas id="labCanvas" class="block w-full h-full"></canvas>
+
+        <!-- แถบแสดงคำบรรยายเหตุการณ์สดบนหน้าจอทดลอง -->
+        <div id="live-status-banner" class="absolute bottom-3 left-3 right-3 bg-slate-950/90 border-2 border-sky-400/70 backdrop-blur-md px-4 py-3 rounded-2xl text-center shadow-xl">
+          <p id="live-status-text" class="text-lg sm:text-xl font-bold text-white leading-snug">
+            เตรียมพร้อม: บีกเกอร์บรรจุน้ำบริสุทธิ์ (H<sub>2</sub>O) และก้อนโลหะโซเดียม (Na)
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ด้านขวา: แผงควบคุมการสอนแบบ Predict -> Observe -> Explain (P-O-E) 5 ส่วน -->
+    <section class="lg:col-span-5 bg-white text-slate-900 rounded-3xl border-4 border-sky-500 shadow-2xl flex flex-col overflow-hidden">
+      
+      <!-- แถบเลือกขั้นตอน P - O - E -->
+      <div class="grid grid-cols-3 bg-slate-200 p-1.5 gap-1.5 border-b-2 border-slate-300">
+        <button id="step-btn-predict" onclick="setPOEStep('predict')" class="py-2.5 px-2 rounded-2xl font-extrabold text-base sm:text-lg flex flex-col items-center justify-center transition bg-amber-400 text-slate-950 shadow-md ring-2 ring-amber-600">
+          <span class="text-xs uppercase tracking-wider opacity-80">ขั้นที่ 1</span>
+          <span>🤔 Predict (ทายผล)</span>
+        </button>
+        <button id="step-btn-observe" onclick="setPOEStep('observe')" class="py-2.5 px-2 rounded-2xl font-extrabold text-base sm:text-lg flex flex-col items-center justify-center transition bg-slate-100 text-slate-700 hover:bg-slate-50">
+          <span class="text-xs uppercase tracking-wider opacity-80">ขั้นที่ 2</span>
+          <span>🔬 Observe (ทดลอง)</span>
+        </button>
+        <button id="step-btn-explain" onclick="setPOEStep('explain')" class="py-2.5 px-2 rounded-2xl font-extrabold text-base sm:text-lg flex flex-col items-center justify-center transition bg-slate-100 text-slate-700 hover:bg-slate-50">
+          <span class="text-xs uppercase tracking-wider opacity-80">ขั้นที่ 3</span>
+          <span>📘 Explain (สรุปผล)</span>
+        </button>
+      </div>
+
+      <!-- พื้นที่เนื้อหาของแต่ละขั้นตอน P-O-E -->
+      <div id="poe-content-area" class="flex-1 p-4 sm:p-5 overflow-y-auto custom-scroll flex flex-col justify-between gap-4">
+        <!-- เนื้อหาจะถูกสร้างโดย JavaScript ตามฐานและขั้นตอนที่เลือก -->
+      </div>
+
+      <!-- แถบปุ่มเปลี่ยนขั้นตอนถัดไปด้านล่าง -->
+      <div class="bg-slate-100 px-4 py-3 border-t-2 border-slate-300 flex items-center justify-between gap-3">
+        <button id="prev-step-btn" onclick="prevPOEStep()" class="btn-lab bg-slate-300 hover:bg-slate-400 text-slate-900 font-extrabold px-4 py-2.5 rounded-2xl text-base sm:text-lg">
+          ⬅️ ย้อนกลับ
+        </button>
+        <div id="step-indicator-dots" class="flex items-center gap-2">
+          <span class="w-3.5 h-3.5 rounded-full bg-amber-500"></span>
+          <span class="w-3.5 h-3.5 rounded-full bg-slate-300"></span>
+          <span class="w-3.5 h-3.5 rounded-full bg-slate-300"></span>
+        </div>
+        <button id="next-step-btn" onclick="nextPOEStep()" class="btn-lab bg-sky-600 hover:bg-sky-500 text-white font-extrabold px-5 py-2.5 rounded-2xl text-base sm:text-lg">
+          ขั้นถัดไป ➡️
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== MODAL สรุปผลการเรียนรู้ทั้งห้องเรียน ==================== -->
+  <div id="summary-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white text-slate-900 max-w-4xl w-full rounded-3xl border-4 border-amber-400 shadow-2xl overflow-hidden animate-fade-in">
+      <div class="bg-gradient-to-r from-sky-700 to-indigo-800 text-white px-6 py-5 flex items-center justify-between">
+        <div>
+          <span class="bg-amber-400 text-slate-950 font-extrabold text-sm px-3 py-1 rounded-full">สรุปบทเรียนวิทยาศาสตร์ ม.3</span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold mt-1">ตารางสรุปปฏิกิริยาเคมีในชีวิตประจำวัน</h2>
+        </div>
+        <button onclick="closeSummaryModal()" class="bg-white/20 hover:bg-white/30 text-white w-11 h-11 rounded-full font-extrabold text-2xl flex items-center justify-center">
+          ✕
+        </button>
+      </div>
+
+      <div class="p-6 space-y-5 max-h-[80vh] overflow-y-auto custom-scroll">
+        <!-- แสดงคะแนนดาวรวม -->
+        <div class="bg-amber-50 border-2 border-amber-300 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <span class="text-4xl">🏆</span>
+            <div>
+              <h3 class="text-xl font-extrabold text-amber-900">ความสำเร็จของห้องเรียนวันนี้</h3>
+              <p class="text-base font-bold text-amber-800">ร่วมกันตั้งสมมติฐาน ทดลอง และสรุปสมการเคมีครบทั้ง 3 ฐาน</p>
+            </div>
+          </div>
+          <div class="bg-amber-400 text-slate-950 px-5 py-2 rounded-2xl font-extrabold text-2xl shadow">
+            ⭐ <span id="modal-star-count">0</span> / 3 ดวง
+          </div>
+        </div>
+
+        <!-- ตารางสรุปทั้ง 3 ปฏิกิริยา -->
+        <div class="overflow-x-auto rounded-2xl border-2 border-slate-300">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-800 text-white text-lg">
+                <th class="p-3.5 border-b border-slate-600">ปฏิกิริยาเคมี</th>
+                <th class="p-3.5 border-b border-slate-600">สารตั้งต้น</th>
+                <th class="p-3.5 border-b border-slate-600">ผลิตภัณฑ์</th>
+                <th class="p-3.5 border-b border-slate-600">จุดสังเกตสำคัญ</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200 text-base sm:text-lg font-bold">
+              <tr class="bg-sky-50/70">
+                <td class="p-3.5 text-sky-900 font-extrabold">1. โลหะ + น้ำ</td>
+                <td class="p-3.5">โลหะ, น้ำ</td>
+                <td class="p-3.5 text-pink-700">สารละลายเบส, แก๊สไฮโดรเจน</td>
+                <td class="p-3.5">เกิดฟองแก๊ส ความร้อน เปลวไฟ (<span class="text-red-600">ระเบิดได้</span>) เปลี่ยนลิตมัสแดงเป็นน้ำเงิน</td>
+              </tr>
+              <tr class="bg-emerald-50/70">
+                <td class="p-3.5 text-emerald-900 font-extrabold">2. โลหะ + กรด</td>
+                <td class="p-3.5">โลหะ, กรด</td>
+                <td class="p-3.5 text-emerald-700">เกลือของโลหะ, แก๊สไฮโดรเจน</td>
+                <td class="p-3.5">เกิดฟองแก๊ส H₂ ทดสอบด้วยไฟติดเสียงดัง <strong>"ป๊อป!"</strong></td>
+              </tr>
+              <tr class="bg-orange-50/70">
+                <td class="p-3.5 text-orange-900 font-extrabold">3. การเกิดสนิมเหล็ก</td>
+                <td class="p-3.5">เหล็ก, น้ำ, แก๊สออกซิเจน</td>
+                <td class="p-3.5 text-amber-800">สนิมเหล็ก (ไอร์ออน(III)ออกไซด์ไฮเดรต)</td>
+                <td class="p-3.5">ต้องมีทั้ง <strong>น้ำ</strong> และ <strong>ออกซิเจน</strong> เกิดคราบสีน้ำตาลแดงผุกร่อน</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-2">
+          <button onclick="resetAllProgress()" class="btn-lab bg-slate-200 hover:bg-slate-300 text-slate-800 font-extrabold px-5 py-3 rounded-2xl text-lg">
+            🔄 เริ่มต้นใหม่ทั้งหมด
+          </button>
+          <button onclick="closeSummaryModal()" class="btn-lab bg-sky-600 hover:bg-sky-500 text-white font-extrabold px-6 py-3 rounded-2xl text-lg">
+            กลับสู่ห้องทดลอง
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== JAVASCRIPT LOGIC & SIMULATION ENGINE ==================== -->
+  <script>
+    /*************************************************************************
+     * 1. ระบบสังเคราะห์เสียงวิทยาศาสตร์ (Web Audio API - ไม่พึ่งพาไฟล์ภายนอก)
+     *************************************************************************/
+    class LabAudioEngine {
+      constructor() {
+        this.ctx = null;
+        this.enabled = true;
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) {
+            this.ctx = new AudioCtx();
+          }
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      playClick() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(520, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(780, this.ctx.currentTime + 0.06);
+        gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.07);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.07);
+      }
+
+      playSuccess() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+        notes.forEach((freq, idx) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          const startTime = this.ctx.currentTime + idx * 0.08;
+          osc.frequency.setValueAtTime(freq, startTime);
+          gain.gain.setValueAtTime(0.18, startTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.28);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(startTime);
+          osc.stop(startTime + 0.28);
+        });
+      }
+
+      playWrong() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(220, this.ctx.currentTime);
+        osc.frequency.linearRampToValueAtTime(165, this.ctx.currentTime + 0.25);
+        gain.gain.setValueAtTime(0.14, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.28);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.28);
+      }
+
+      playSplash() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const bufferSize = this.ctx.sampleRate * 0.25;
+        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (this.ctx.sampleRate * 0.08));
+        }
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = buffer;
+
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(600, this.ctx.currentTime);
+
+        const gain = this.ctx.createGain();
+        gain.gain.setValueAtTime(0.35, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.25);
+
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+        noise.start();
+      }
+
+      playFizz(duration = 1.2) {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const bufferSize = this.ctx.sampleRate * duration;
+        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = (Math.random() * 2 - 1) * 0.5;
+        }
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = buffer;
+
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'highpass';
+        filter.frequency.setValueAtTime(2200, this.ctx.currentTime);
+
+        const gain = this.ctx.createGain();
+        gain.gain.setValueAtTime(0.14, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.005, this.ctx.currentTime + duration);
+
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+        noise.start();
+      }
+
+      playExplosion() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const duration = 0.65;
+        const bufferSize = this.ctx.sampleRate * duration;
+        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (this.ctx.sampleRate * 0.16));
+        }
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = buffer;
+
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(450, this.ctx.currentTime);
+        filter.frequency.exponentialRampToValueAtTime(60, this.ctx.currentTime + duration);
+
+        const gain = this.ctx.createGain();
+        gain.gain.setValueAtTime(0.65, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+        noise.start();
+      }
+
+      playPop() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        // เสียงทดสอบแก๊สไฮโดรเจนดัง "ป๊อป!"
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(320, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(65, this.ctx.currentTime + 0.12);
+
+        gain.gain.setValueAtTime(0.7, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.14);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.14);
+      }
+    }
+
+    const audio = new LabAudioEngine();
+
+    function toggleSound() {
+      audio.enabled = !audio.enabled;
+      const btn = document.getElementById('sound-toggle-btn');
+      const icon = document.getElementById('sound-icon');
+      const label = document.getElementById('sound-label');
+      if (audio.enabled) {
+        icon.textContent = '🔊';
+        label.textContent = 'เปิดเสียง';
+        btn.classList.remove('bg-slate-700', 'border-slate-500');
+        btn.classList.add('bg-emerald-600', 'border-emerald-300');
+        audio.playClick();
+      } else {
+        icon.textContent = '🔇';
+        label.textContent = 'ปิดเสียง';
+        btn.classList.remove('bg-emerald-600', 'border-emerald-300');
+        btn.classList.add('bg-slate-700', 'border-slate-500');
+      }
+    }
+
+    /*************************************************************************
+     * 2. ข้อมูลหลักสูตรและคำถามทั้ง 3 ฐาน (อ้างอิงสไลด์การสอน ม.3)
+     *************************************************************************/
+    const STATIONS_DATA = {
+      1: {
+        title: 'ฐานที่ 1: ปฏิกิริยาเคมีระหว่างโลหะกับน้ำ',
+        showDanger: true,
+        predict: {
+          question: 'เมื่อหย่อนก้อนโลหะโซเดียม (Na) ลงในน้ำ (H₂O) จะเกิดการเปลี่ยนแปลงอย่างไร?',
+          hint: '💡 คำใบ้: โซเดียมเป็นโลหะหมู่ 1 ที่ว่องไวต่อปฏิกิริยามาก เมื่อสัมผัสน้ำจะคายความร้อนสูงและเกิดแก๊สติดไฟ!',
+          options: [
+            { id: 'A', text: 'ก. จมลงก้นบีกเกอร์นิ่งๆ ไม่เกิดการเปลี่ยนแปลง', correct: false },
+            { id: 'B', text: 'ข. วิ่งวนบนผิวน้ำ เกิดฟองแก๊ส ความร้อน เปลวไฟ และระเบิดได้', correct: true },
+            { id: 'C', text: 'ค. น้ำในบีกเกอร์แข็งตัวกลายเป็นน้ำแข็งทันที', correct: false }
+          ],
+          feedbackCorrect: 'ยอดเยี่ยมมาก! โซเดียมทำปฏิกิริยารุนแรงกับน้ำ คายความร้อนสูง จนเกิดเปลวไฟและระเบิดได้ พร้อมได้แก๊สไฮโดรเจนและสารละลายเบส',
+          feedbackWrong: 'ยังไม่ใช่นะครับ ลองสังเกตป้ายเตือน "ระเบิดได้" แล้วลองกดไปขั้นที่ 2 (Observe) เพื่อหย่อนโซเดียมดูของจริงกันเลย!'
+        },
+        explain: {
+          reactants: 'โลหะ, น้ำ',
+          products: 'สารละลายเบส, แก๊สไฮโดรเจน',
+          equations: [
+            {
+              formula: '2Na (s) + 2H₂O (l)  ⟶  2NaOH (aq) + H₂ (g)',
+              thaiRead: 'โซเดียม  +  น้ำ   ⟶   โซเดียมไฮดรอกไซด์ (เบส)  +  แก๊สไฮโดรเจน'
+            }
+          ],
+          keyTakeaway: 'พิสูจน์ความเป็นเบสได้ด้วย "ฟีนอล์ฟทาลีน" (เปลี่ยนเป็นสีชมพูบานเย็น) และ "กระดาษลิตมัสสีแดง" (เปลี่ยนเป็นสีน้ำเงิน)'
+        }
+      },
+      2: {
+        title: 'ฐานที่ 2: ปฏิกิริยาเคมีระหว่างโลหะกับกรด',
+        showDanger: false,
+        predict: {
+          question: 'เมื่อหย่อนโลหะสังกะสี (Zn) หรือแคลเซียม (Ca) ลงในกรดไฮโดรคลอริก (HCl) จะเกิดอะไรขึ้น?',
+          hint: '💡 คำใบ้: โลหะจะทำปฏิกิริยากับกรดแล้วปล่อยฟองแก๊สชนิดหนึ่งออกมา ซึ่งเมื่อจุดไฟจ่อจะดัง "ป๊อป!"',
+          options: [
+            { id: 'A', text: 'ก. เกิดฟองแก๊สไฮโดรเจน (H₂) ผุดขึ้น และได้เกลือของโลหะ', correct: true },
+            { id: 'B', text: 'ข. สารละลายเปลี่ยนเป็นสีชมพูเข้มทันที', correct: false },
+            { id: 'C', text: 'ค. โลหะขยายขนาดใหญ่ขึ้นจนล้นหลอดทดลอง', correct: false }
+          ],
+          feedbackCorrect: 'ถูกต้องครับ! โลหะทำปฏิกิริยากับกรดได้ "เกลือของโลหะ" และ "แก๊สไฮโดรเจน (H₂)" โดยแคลเซียม (Ca) จะเกิดฟองฟู่แรงกว่าสังกะสี (Zn)',
+          feedbackWrong: 'ลองคิดดูใหม่นะครับ เมื่อโลหะโดนกรดกัดกร่อน มักจะมีฟองแก๊สผุดขึ้นมา ไปทดลองในขั้นที่ 2 กันเลย!'
+        },
+        explain: {
+          reactants: 'โลหะ, กรด',
+          products: 'เกลือของโลหะ, แก๊สไฮโดรเจน',
+          equations: [
+            {
+              formula: 'Zn (s) + 2HCl (aq)  ⟶  ZnCl₂ (aq) + H₂ (g)',
+              thaiRead: 'สังกะสี  +  กรดไฮโดรคลอริก   ⟶   ซิงค์คลอไรด์  +  แก๊สไฮโดรเจน'
+            },
+            {
+              formula: 'Ca (s) + 2HCl (aq)  ⟶  CaCl₂ (aq) + H₂ (g)',
+              thaiRead: 'แคลเซียม  +  กรดไฮโดรคลอริก   ⟶   แคลเซียมคลอไรด์  +  แก๊สไฮโดรเจน'
+            }
+          ],
+          keyTakeaway: 'ทดสอบแก๊สไฮโดรเจน (H₂) ได้โดยนำธูปหรือไม้ขีดไฟติดไฟจ่อปากหลอดทดลอง จะเกิดเสียงดัง "ป๊อป!"'
+        }
+      },
+      3: {
+        title: 'ฐานที่ 3: ปฏิกิริยาเคมีการเกิดสนิมเหล็ก',
+        showDanger: false,
+        predict: {
+          question: 'ตะปูเหล็กในหลอดทดลองใดจะเกิด "สนิมเหล็ก" ชัดเจนที่สุดเมื่อเวลาผ่านไป 14 วัน?',
+          hint: '💡 คำใบ้: การเกิดสนิมเหล็กต้องอาศัยปัจจัยร่วมกันครบทั้ง 2 อย่าง คือ "น้ำ (ความชื้น)" และ "แก๊สออกซิเจน"',
+          options: [
+            { id: 'A', text: 'ก. หลอดที่ 1: ตะปูเหล็ก + น้ำ + อากาศ (มีทั้งน้ำและออกซิเจน)', correct: true },
+            { id: 'B', text: 'ข. หลอดที่ 2: ตะปูเหล็ก + น้ำต้มสุกเทน้ำมันทับ (ไม่มีออกซิเจน)', correct: false },
+            { id: 'C', text: 'ค. หลอดที่ 3: ตะปูเหล็ก + สารดูดความชื้น (ไม่มีน้ำ/ความชื้น)', correct: false }
+          ],
+          feedbackCorrect: 'เก่งมากครับ! ตะปูเหล็กต้องสัมผัสทั้ง "น้ำ" และ "แก๊สออกซิเจน" พร้อมกัน จึงจะเกิดปฏิกิริยากลายเป็นสนิมสีน้ำตาลแดง',
+          feedbackWrong: 'ลองสังเกตตัวแปรในแต่ละหลอดนะครับ หากขาดน้ำหรือขาดออกซิเจนอย่างใดอย่างหนึ่ง สนิมจะเกิดได้ยาก ไปเร่งเวลาทดลองดูกัน!'
+        },
+        explain: {
+          reactants: 'เหล็ก (Fe), แก๊สออกซิเจน (O₂), น้ำ/ความชื้น (H₂O)',
+          products: 'สนิมเหล็ก (ไอร์ออน(III)ออกไซด์ไฮเดรต)',
+          equations: [
+            {
+              formula: '4Fe (s) + 3O₂ (g) + xH₂O (l)  ⟶  2Fe₂O₃·xH₂O (s)',
+              thaiRead: 'เหล็ก  +  แก๊สออกซิเจน  +  น้ำ   ⟶   สนิมเหล็ก (สีน้ำตาลแดง)'
+            }
+          ],
+          keyTakeaway: 'การป้องกันสนิมทำได้โดยการทาสี เคลือบน้ำมัน ชุบโลหะ หรือเก็บในที่แห้ง เพื่อตัดขาดเหล็กออกจากน้ำและออกซิเจน'
+        }
+      }
+    };
+
+    /*************************************************************************
+     * 3. สถานะของแอปพลิเคชันและการจำลอง (APPLICATION & SIMULATION STATE)
+     *************************************************************************/
+    const state = {
+      currentStation: 1,
+      currentStep: 'predict', // 'predict' | 'observe' | 'explain'
+      starsEarned: { 1: false, 2: false, 3: false },
+      selectedAnswers: { 1: null, 2: null, 3: null },
+      showHint: { 1: false, 2: false, 3: false },
+      revealAnswer: { 1: true, 2: true, 3: true },
+
+      // สถานะจำลองฐานที่ 1 (โลหะ + น้ำ)
+      sim1: {
+        sodiumDropped: false,
+        sodiumX: 0,
+        sodiumY: 0,
+        sodiumVx: 2.2,
+        sodiumRadius: 24,
+        reactionProgress: 0,
+        exploded: false,
+        explosionTimer: 0,
+        phenolphthaleinAdded: false,
+        solutionPinkLevel: 0, // 0 -> 1
+        litmusDipped: false,
+        litmusBlueLevel: 0, // 0 -> 1
+        flameTested: false,
+        flameTestTimer: 0
+      },
+
+      // สถานะจำลองฐานที่ 2 (โลหะ + กรด)
+      sim2: {
+        metalType: null, // 'Zn' | 'Ca'
+        metalY: 0,
+        metalRadius: 20,
+        reactionActive: false,
+        flameTested: false,
+        flameTestTimer: 0
+      },
+
+      // สถานะจำลองฐานที่ 3 (การเกิดสนิม)
+      sim3: {
+        day: 1, // 1 ถึง 14
+        isPlaying: false
+      }
+    };
+
+    // ระบบอนุภาคสำหรับแอนิเมชันบน Canvas (ฟองแก๊ส, ประกายไฟ, ควัน)
+    let particles = [];
+
+    /*************************************************************************
+     * 4. การจัดการ UI แผงควบคุม P-O-E และระบบเปลี่ยนฐาน
+     *************************************************************************/
+    function updateHeaderUI() {
+      // อัปเดตปุ่มเลือกฐาน 1, 2, 3
+      [1, 2, 3].forEach(num => {
+        const btn = document.getElementById(`tab-${num}`);
+        const badgeDone = document.getElementById(`badge-done-${num}`);
+        if (state.starsEarned[num]) {
+          badgeDone.classList.remove('hidden');
+        } else {
+          badgeDone.classList.add('hidden');
+        }
+
+        if (state.currentStation === num) {
+          btn.className = 'btn-lab px-4 py-2.5 rounded-2xl font-extrabold text-base sm:text-lg flex items-center gap-2 bg-sky-500 text-slate-950 ring-4 ring-white';
+        } else {
+          btn.className = 'btn-lab px-4 py-2.5 rounded-2xl font-extrabold text-base sm:text-lg flex items-center gap-2 bg-slate-800 text-slate-200 hover:bg-slate-700 border-2 border-slate-600';
+        }
+      });
+
+      // นับดาวรวม
+      const totalStars = Object.values(state.starsEarned).filter(Boolean).length;
+      document.getElementById('star-count').textContent = totalStars;
+      document.getElementById('modal-star-count').textContent = totalStars;
+
+      // อัปเดตหัวข้อบน Canvas และป้ายเตือน
+      const stationInfo = STATIONS_DATA[state.currentStation];
+      document.getElementById('canvas-station-title').textContent = stationInfo.title;
+      const dangerBadge = document.getElementById('danger-badge');
+      if (stationInfo.showDanger) {
+        dangerBadge.classList.remove('hidden');
+      } else {
+        dangerBadge.classList.add('hidden');
+      }
+    }
+
+    function switchStation(stationNum) {
+      audio.playClick();
+      state.currentStation = stationNum;
+      state.currentStep = 'predict';
+      particles = [];
+      updateHeaderUI();
+      updateLiveStatusBanner();
+      renderPOEPanel();
+    }
+
+    function setPOEStep(step) {
+      audio.playClick();
+      state.currentStep = step;
+
+      // หากครูข้ามมาขั้น Explain ให้ถือว่าห้องเรียนได้เรียนรู้ฐานนี้และได้รับดาว
+      if (step === 'explain' && !state.starsEarned[state.currentStation]) {
+        state.starsEarned[state.currentStation] = true;
+        audio.playSuccess();
+        updateHeaderUI();
+      }
+
+      renderPOEPanel();
+    }
+
+    function nextPOEStep() {
+      if (state.currentStep === 'predict') setPOEStep('observe');
+      else if (state.currentStep === 'observe') setPOEStep('explain');
+      else if (state.currentStep === 'explain') {
+        if (state.currentStation < 3) {
+          switchStation(state.currentStation + 1);
+        } else {
+          openSummaryModal();
+        }
+      }
+    }
+
+    function prevPOEStep() {
+      if (state.currentStep === 'explain') setPOEStep('observe');
+      else if (state.currentStep === 'observe') setPOEStep('predict');
+    }
+
+    function updateStepButtonsUI() {
+      const steps = ['predict', 'observe', 'explain'];
+      const activeStyles = {
+        predict: 'bg-amber-400 text-slate-950 shadow-md ring-2 ring-amber-600',
+        observe: 'bg-emerald-500 text-slate-950 shadow-md ring-2 ring-emerald-700',
+        explain: 'bg-sky-500 text-slate-950 shadow-md ring-2 ring-sky-700'
+      };
+
+      steps.forEach(s => {
+        const btn = document.getElementById(`step-btn-${s}`);
+        if (state.currentStep === s) {
+          btn.className = `py-2.5 px-2 rounded-2xl font-extrabold text-base sm:text-lg flex flex-col items-center justify-center transition ${activeStyles[s]}`;
+        } else {
+          btn.className = 'py-2.5 px-2 rounded-2xl font-extrabold text-base sm:text-lg flex flex-col items-center justify-center transition bg-slate-100 text-slate-700 hover:bg-slate-50';
+        }
+      });
+
+      // ปุ่มย้อนกลับ / ถัดไป
+      const prevBtn = document.getElementById('prev-step-btn');
+      const nextBtn = document.getElementById('next-step-btn');
+      prevBtn.disabled = state.currentStep === 'predict';
+
+      if (state.currentStep === 'explain') {
+        nextBtn.textContent = state.currentStation < 3 ? 'ไปฐานถัดไป ➡️' : '🏆 ดูสรุปผลทั้งหมด';
+        nextBtn.className = 'btn-lab bg-purple-600 hover:bg-purple-500 text-white font-extrabold px-5 py-2.5 rounded-2xl text-base sm:text-lg';
+      } else {
+        nextBtn.textContent = 'ขั้นถัดไป ➡️';
+        nextBtn.className = 'btn-lab bg-sky-600 hover:bg-sky-500 text-white font-extrabold px-5 py-2.5 rounded-2xl text-base sm:text-lg';
+      }
+
+      // จุดบอกสถานะ
+      const dotsContainer = document.getElementById('step-indicator-dots');
+      dotsContainer.innerHTML = steps.map(s => {
+        const activeColor = s === 'predict' ? 'bg-amber-500' : s === 'observe' ? 'bg-emerald-500' : 'bg-sky-500';
+        return `<span class="w-3.5 h-3.5 rounded-full ${state.currentStep === s ? activeColor + ' scale-125' : 'bg-slate-300'} transition"></span>`;
+      }).join('');
+    }
+
+    function renderPOEPanel() {
+      updateStepButtonsUI();
+      const container = document.getElementById('poe-content-area');
+      const stNum = state.currentStation;
+      const data = STATIONS_DATA[stNum];
+
+      if (state.currentStep === 'predict') {
+        const selected = state.selectedAnswers[stNum];
+        const hintShown = state.showHint[stNum];
+
+        let optionsHTML = data.predict.options.map(opt => {
+          let btnClass = 'bg-slate-100 hover:bg-amber-50 border-slate-300 text-slate-900';
+          let icon = '⚪';
+          if (selected === opt.id) {
+            if (opt.correct) {
+              btnClass = 'bg-emerald-100 border-emerald-600 text-emerald-950 ring-2 ring-emerald-500';
+              icon = '✅';
+            } else {
+              btnClass = 'bg-rose-100 border-rose-500 text-rose-950 ring-2 ring-rose-400';
+              icon = '❌';
+            }
+          }
+          return `
+            <button onclick="selectPredictOption(${stNum}, '${opt.id}')" class="w-full text-left p-3.5 rounded-2xl border-2 font-bold text-lg sm:text-xl transition flex items-start gap-3 ${btnClass}">
+              <span class="text-xl mt-0.5">${icon}</span>
+              <span class="leading-snug">${opt.text}</span>
+            </button>
+          `;
+        }).join('');
+
+        let feedbackHTML = '';
+        if (selected) {
+          const chosenObj = data.predict.options.find(o => o.id === selected);
+          if (chosenObj.correct) {
+            feedbackHTML = `
+              <div class="bg-emerald-600 text-white p-4 rounded-2xl font-bold text-base sm:text-lg shadow-md animate-fade-in">
+                🎉 ${data.predict.feedbackCorrect}
+              </div>
+            `;
+          } else {
+            feedbackHTML = `
+              <div class="bg-rose-600 text-white p-4 rounded-2xl font-bold text-base sm:text-lg shadow-md animate-fade-in">
+                🤔 ${data.predict.feedbackWrong}
+              </div>
+            `;
+          }
+        }
+
+        container.innerHTML = `
+          <div class="space-y-4 animate-fade-in">
+            <div class="bg-amber-100 border-l-8 border-amber-500 p-4 rounded-2xl">
+              <span class="inline-block bg-amber-500 text-slate-950 font-extrabold text-sm px-3 py-0.5 rounded-full mb-1">
+                คำถามชวนคิดก่อนทดลอง (Predict)
+              </span>
+              <h3 class="text-xl sm:text-2xl font-extrabold text-slate-900 leading-snug">
+                ${data.predict.question}
+              </h3>
+            </div>
+
+            <div class="space-y-2.5">
+              ${optionsHTML}
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
+              <button onclick="toggleHint(${stNum})" class="bg-amber-200 hover:bg-amber-300 text-amber-950 font-extrabold px-4 py-2 rounded-xl text-base flex items-center gap-1.5">
+                <span>💡</span>
+                <span>${hintShown ? 'ซ่อนคำใบ้' : 'ขอคำใบ้สำหรับนักเรียน'}</span>
+              </button>
+            </div>
+
+            ${hintShown ? `
+              <div class="bg-amber-50 border-2 border-amber-400 p-3.5 rounded-2xl text-amber-950 font-bold text-base sm:text-lg animate-fade-in">
+                ${data.predict.hint}
+              </div>
+            ` : ''}
+
+            ${feedbackHTML}
+          </div>
+        `;
+      } else if (state.currentStep === 'observe') {
+        if (stNum === 1) {
+          container.innerHTML = renderObserveStation1();
+        } else if (stNum === 2) {
+          container.innerHTML = renderObserveStation2();
+        } else {
+          container.innerHTML = renderObserveStation3();
+        }
+      } else if (state.currentStep === 'explain') {
+        const revealed = state.revealAnswer[stNum];
+        const eqHTML = data.explain.equations.map(eq => `
+          <div class="bg-slate-900 text-white p-4 rounded-2xl border-2 border-sky-400 shadow-inner space-y-1.5">
+            <div class="text-xl sm:text-2xl font-extrabold text-amber-300 tracking-wide text-center">
+              ${revealed ? eq.formula : '❓  +  ❓   ⟶   ❓  +  ❓'}
+            </div>
+            <div class="text-base sm:text-lg font-bold text-sky-200 text-center">
+              ${revealed ? `(${eq.thaiRead})` : '(กดปุ่ม "แสดงเฉลย" เพื่อดูสมการเคมี)'}
+            </div>
+          </div>
+        `).join('');
+
+        container.innerHTML = `
+          <div class="space-y-4 animate-fade-in">
+            <div class="flex items-center justify-between gap-2">
+              <span class="bg-sky-600 text-white font-extrabold text-sm sm:text-base px-3.5 py-1 rounded-full">
+                📘 สรุปสารตั้งต้น ผลิตภัณฑ์ และสมการ
+              </span>
+              <button onclick="toggleRevealAnswer(${stNum})" class="btn-lab ${revealed ? 'bg-slate-700 text-white' : 'bg-amber-400 text-slate-950'} font-extrabold px-4 py-1.5 rounded-xl text-base">
+                ${revealed ? '🙈 ซ่อนเฉลยถามนักเรียน' : '👁️ แสดงเฉลยทั้งหมด'}
+              </button>
+            </div>
+
+            <!-- ตารางสารตั้งต้น - ผลิตภัณฑ์ ตามสไลด์ -->
+            <div class="grid grid-cols-2 rounded-2xl overflow-hidden border-2 border-emerald-600 shadow">
+              <div class="bg-lime-200 p-3 text-center border-r border-emerald-600">
+                <div class="text-base sm:text-lg font-extrabold text-purple-900">สารตั้งต้น</div>
+              </div>
+              <div class="bg-lime-200 p-3 text-center">
+                <div class="text-base sm:text-lg font-extrabold text-purple-900">ผลิตภัณฑ์</div>
+              </div>
+              <div class="bg-emerald-50 p-4 text-center border-r border-t border-emerald-600 flex items-center justify-center">
+                <div class="text-lg sm:text-xl font-extrabold text-slate-900">
+                  ${revealed ? data.explain.reactants : '❓ (ให้นักเรียนตอบ)'}
+                </div>
+              </div>
+              <div class="bg-emerald-50 p-4 text-center border-t border-emerald-600 flex items-center justify-center">
+                <div class="text-lg sm:text-xl font-extrabold text-sky-900">
+                  ${revealed ? data.explain.products : '❓ (ให้นักเรียนตอบ)'}
+                </div>
+              </div>
+            </div>
+
+            <!-- สมการตัวอย่าง -->
+            <div class="space-y-2.5">
+              <div class="text-lg font-extrabold text-slate-800 underline decoration-sky-500 decoration-4">
+                ตัวอย่างสมการเคมี:
+              </div>
+              ${eqHTML}
+            </div>
+
+            <!-- ข้อสรุปเพิ่มเติม -->
+            <div class="bg-sky-50 border-2 border-sky-300 p-3.5 rounded-2xl text-slate-800 font-bold text-base sm:text-lg">
+              🌟 <strong>จุดสังเกตสำคัญ:</strong> ${data.explain.keyTakeaway}
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function selectPredictOption(stNum, optId) {
+      state.selectedAnswers[stNum] = optId;
+      const chosenObj = STATIONS_DATA[stNum].predict.options.find(o => o.id === optId);
+      if (chosenObj.correct) {
+        audio.playSuccess();
+      } else {
+        audio.playWrong();
+      }
+      renderPOEPanel();
+    }
+
+    function toggleHint(stNum) {
+      audio.playClick();
+      state.showHint[stNum] = !state.showHint[stNum];
+      renderPOEPanel();
+    }
+
+    function toggleRevealAnswer(stNum) {
+      audio.playClick();
+      state.revealAnswer[stNum] = !state.revealAnswer[stNum];
+      renderPOEPanel();
+    }
+
+    /*************************************************************************
+     * 5. แผงควบคุมการทดลอง (OBSERVE CONTROLS) ของแต่ละฐาน
+     *************************************************************************/
+    function renderObserveStation1() {
+      const s = state.sim1;
+      return `
+        <div class="space-y-3.5 animate-fade-in">
+          <div class="bg-emerald-100 border-l-8 border-emerald-600 p-3.5 rounded-2xl">
+            <h3 class="text-xl font-extrabold text-emerald-950">🔬 ลงมือทดลอง: โลหะโซเดียม (Na) + น้ำ (H₂O)</h3>
+            <p class="text-base font-bold text-emerald-900">กดปุ่มตามลำดับเพื่อสังเกตปฏิกิริยาและทดสอบผลิตภัณฑ์</p>
+          </div>
+
+          <button onclick="actionDropSodium()" ${s.sodiumDropped ? 'disabled' : ''} class="btn-lab w-full py-3.5 px-4 rounded-2xl font-extrabold text-lg sm:text-xl bg-amber-400 hover:bg-amber-300 text-slate-950 flex items-center justify-center gap-2.5">
+            <span class="text-2xl">🧪</span>
+            <span>1. หย่อนโลหะโซเดียม (Na) ลงในน้ำ</span>
+          </button>
+
+          <button onclick="actionAddPhenolphthalein()" ${!s.sodiumDropped || s.phenolphthaleinAdded ? 'disabled' : ''} class="btn-lab w-full py-3.5 px-4 rounded-2xl font-extrabold text-lg sm:text-xl bg-pink-600 hover:bg-pink-500 text-white flex items-center justify-center gap-2.5">
+            <span class="text-2xl">💧</span>
+            <span>2. หยดฟีนอล์ฟทาลีน (ทดสอบเบส)</span>
+          </button>
+
+          <button onclick="actionDipLitmus()" ${!s.sodiumDropped || s.litmusDipped ? 'disabled' : ''} class="btn-lab w-full py-3.5 px-4 rounded-2xl font-extrabold text-lg sm:text-xl bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center gap-2.5">
+            <span class="text-2xl">📄</span>
+            <span>3. จุ่มกระดาษลิตมัสสีแดง</span>
+          </button>
+
+          <button onclick="actionTestFlame1()" ${!s.sodiumDropped ? 'disabled' : ''} class="btn-lab w-full py-3.5 px-4 rounded-2xl font-extrabold text-lg sm:text-xl bg-orange-600 hover:bg-orange-500 text-white flex items-center justify-center gap-2.5">
+            <span class="text-2xl">🔥</span>
+            <span>4. จุดไฟทดสอบแก๊สไฮโดรเจน (H₂)</span>
+          </button>
+
+          <div class="pt-1 flex justify-end">
+            <button onclick="resetSim1()" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-extrabold px-4 py-2 rounded-xl text-base">
+              🔄 ล้างบีกเกอร์ / ทดลองใหม่
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderObserveStation2() {
+      const s = state.sim2;
+      return `
+        <div class="space-y-3.5 animate-fade-in">
+          <div class="bg-emerald-100 border-l-8 border-emerald-600 p-3.5 rounded-2xl">
+            <h3 class="text-xl font-extrabold text-emerald-950">🔬 ลงมือทดลอง: โลหะ + กรดไฮโดรคลอริก (HCl)</h3>
+            <p class="text-base font-bold text-emerald-900">เลือกหย่อนโลหะเพื่อเปรียบเทียบความเร็วในการเกิดฟองแก๊ส</p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <button onclick="actionDropAcidMetal('Zn')" class="btn-lab py-4 px-3 rounded-2xl font-extrabold text-lg bg-slate-700 hover:bg-slate-600 text-white flex flex-col items-center justify-center gap-1 border-2 ${s.metalType === 'Zn' ? 'ring-4 ring-sky-400 border-sky-300' : 'border-slate-500'}">
+              <span class="text-2xl">🔩</span>
+              <span>หย่อนสังกะสี (Zn)</span>
+              <span class="text-xs font-bold text-slate-300">เกิดฟองแก๊สปานกลาง</span>
+            </button>
+
+            <button onclick="actionDropAcidMetal('Ca')" class="btn-lab py-4 px-3 rounded-2xl font-extrabold text-lg bg-teal-600 hover:bg-teal-500 text-white flex flex-col items-center justify-center gap-1 border-2 ${s.metalType === 'Ca' ? 'ring-4 ring-amber-300 border-amber-200' : 'border-teal-400'}">
+              <span class="text-2xl">🪨</span>
+              <span>หย่อนแคลเซียม (Ca)</span>
+              <span class="text-xs font-bold text-teal-100">เกิดฟองแก๊สรุนแรงมาก!</span>
+            </button>
+          </div>
+
+          <button onclick="actionTestFlame2()" ${!s.reactionActive ? 'disabled' : ''} class="btn-lab w-full py-4 px-4 rounded-2xl font-extrabold text-lg sm:text-xl bg-orange-600 hover:bg-orange-500 text-white flex items-center justify-center gap-2.5">
+            <span class="text-2xl">🔥</span>
+            <span>จ่อไม้ขีดติดไฟที่ปากหลอด (ทดสอบแก๊ส H₂)</span>
+          </button>
+
+          <div class="pt-1 flex justify-end">
+            <button onclick="resetSim2()" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-extrabold px-4 py-2 rounded-xl text-base">
+              🔄 ล้างหลอดทดลอง / ทดลองใหม่
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderObserveStation3() {
+      const s = state.sim3;
+      return `
+        <div class="space-y-4 animate-fade-in">
+          <div class="bg-emerald-100 border-l-8 border-emerald-600 p-3.5 rounded-2xl">
+            <h3 class="text-xl font-extrabold text-emerald-950">🔬 สังเกตการเกิดสนิมเหล็ก (เปรียบเทียบ 3 หลอด)</h3>
+            <p class="text-base font-bold text-emerald-900">เลื่อนแถบเวลา หรือกดปุ่มเร่งเวลาเพื่อดูผลวันที่ 1 ถึง 14</p>
+          </div>
+
+          <div class="bg-slate-100 p-4 rounded-2xl border-2 border-slate-300 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-lg font-extrabold text-slate-800">⏱️ ระยะเวลาที่ผ่านไป:</span>
+              <span class="bg-amber-400 text-slate-950 font-extrabold text-xl px-4 py-1 rounded-full shadow">
+                วันที่ ${Math.round(s.day)} / 14
+              </span>
+            </div>
+
+            <input type="range" min="1" max="14" step="0.1" value="${s.day}" oninput="onRustDaySlide(this.value)" class="lab-slider w-full" />
+
+            <div class="flex items-center justify-between gap-2 pt-1">
+              <button onclick="toggleRustAutoPlay()" class="btn-lab flex-1 py-3 px-4 rounded-2xl font-extrabold text-lg ${s.isPlaying ? 'bg-rose-600 text-white' : 'bg-emerald-600 hover:bg-emerald-500 text-white'}">
+                ${s.isPlaying ? '⏸️ หยุดชั่วคราว' : '▶️ เล่นเร่งเวลาอัตโนมัติ (Time-lapse)'}
+              </button>
+              <button onclick="resetSim3()" class="btn-lab bg-slate-300 hover:bg-slate-400 text-slate-900 font-extrabold py-3 px-4 rounded-2xl text-lg">
+                🔄 วันที่ 1
+              </button>
+            </div>
+          </div>
+
+          <div class="bg-orange-50 border-2 border-orange-300 p-3.5 rounded-2xl text-base font-bold text-orange-950 space-y-1">
+            <div>• <strong>หลอด 1:</strong> น้ำ + อากาศ (ครบปัจจัย → เกิดสนิม)</div>
+            <div>• <strong>หลอด 2:</strong> น้ำต้มสุก + น้ำมันทับ (ขาดออกซิเจน → ไม่เกิดสนิม)</div>
+            <div>• <strong>หลอด 3:</strong> สารดูดความชื้น (ขาดน้ำ → ไม่เกิดสนิม)</div>
+          </div>
+        </div>
+      `;
+    }
+
+    /*************************************************************************
+     * 6. ฟังก์ชันสั่งงานการทดลอง (SIMULATION ACTIONS)
+     *************************************************************************/
+    function updateLiveStatusBanner(customText = null) {
+      const el = document.getElementById('live-status-text');
+      if (customText) {
+        el.innerHTML = customText;
+        return;
+      }
+      if (state.currentStation === 1) {
+        el.innerHTML = 'เตรียมพร้อม: บีกเกอร์บรรจุน้ำบริสุทธิ์ (H<sub>2</sub>O) และก้อนโลหะโซเดียม (Na)';
+      } else if (state.currentStation === 2) {
+        el.innerHTML = 'เตรียมพร้อม: หลอดทดลองบรรจุสารละลายกรดไฮโดรคลอริก (HCl)';
+      } else {
+        el.innerHTML = `การทดลองเปรียบเทียบการเกิดสนิมเหล็ก — วันที่ ${Math.round(state.sim3.day)} จาก 14 วัน`;
+      }
+    }
+
+    // --- ฐานที่ 1 Actions ---
+    function actionDropSodium() {
+      if (state.sim1.sodiumDropped) return;
+      audio.playSplash();
+      setTimeout(() => audio.playFizz(2.5), 150);
+
+      state.sim1.sodiumDropped = true;
+      state.sim1.reactionProgress = 0;
+      state.sim1.exploded = false;
+      updateLiveStatusBanner('⚡ โซเดียม (Na) วิ่งวนบนผิวน้ำ เกิดความร้อนสูง ฟองแก๊ส H<sub>2</sub> และเปลวไฟ!');
+      renderPOEPanel();
+
+      // สร้างเอฟเฟกต์ระเบิดเล็กน้อยหลังวิ่งวน 2.2 วินาที
+      setTimeout(() => {
+        if (state.currentStation === 1 && state.sim1.sodiumDropped) {
+          state.sim1.exploded = true;
+          state.sim1.explosionTimer = 60;
+          audio.playExplosion();
+          spawnExplosionParticles();
+          updateLiveStatusBanner('💥 เกิดการระเบิดเล็กน้อยจากความร้อนและแก๊สไฮโดรเจน! ได้สารละลาย NaOH');
+        }
+      }, 2200);
+    }
+
+    function actionAddPhenolphthalein() {
+      if (!state.sim1.sodiumDropped) return;
+      audio.playClick();
+      state.sim1.phenolphthaleinAdded = true;
+      updateLiveStatusBanner('💖 หยดฟีนอล์ฟทาลีนแล้ว! สารละลายเปลี่ยนเป็นสีชมพูบานเย็น แสดงว่ามีสมบัติเป็น "เบส" (NaOH)');
+      renderPOEPanel();
+    }
+
+    function actionDipLitmus() {
+      if (!state.sim1.sodiumDropped) return;
+      audio.playClick();
+      state.sim1.litmusDipped = true;
+      updateLiveStatusBanner('🔵 กระดาษลิตมัสสีแดงเปลี่ยนเป็น "สีน้ำเงิน" ยืนยันว่าเกิดสารละลายเบส!');
+      renderPOEPanel();
+    }
+
+    function actionTestFlame1() {
+      if (!state.sim1.sodiumDropped) return;
+      audio.playPop();
+      state.sim1.flameTested = true;
+      state.sim1.flameTestTimer = 45;
+      spawnPopSparkles();
+      updateLiveStatusBanner('🔥 เสียงดัง "ป๊อป!" ยืนยันว่ามีแก๊สไฮโดรเจน (H<sub>2</sub>) เกิดขึ้นจริง!');
+    }
+
+    function resetSim1() {
+      audio.playClick();
+      state.sim1 = {
+        sodiumDropped: false,
+        sodiumX: 0,
+        sodiumY: 0,
+        sodiumVx: 2.2,
+        sodiumRadius: 24,
+        reactionProgress: 0,
+        exploded: false,
+        explosionTimer: 0,
+        phenolphthaleinAdded: false,
+        solutionPinkLevel: 0,
+        litmusDipped: false,
+        litmusBlueLevel: 0,
+        flameTested: false,
+        flameTestTimer: 0
+      };
+      particles = [];
+      updateLiveStatusBanner();
+      renderPOEPanel();
+    }
+
+    // --- ฐานที่ 2 Actions ---
+    function actionDropAcidMetal(type) {
+      audio.playSplash();
+      audio.playFizz(type === 'Ca' ? 2.5 : 1.5);
+      state.sim2.metalType = type;
+      state.sim2.metalY = -120; // เริ่มตกจากปากหลอดทดลอง
+      state.sim2.metalRadius = 20;
+      state.sim2.reactionActive = true;
+      particles = [];
+
+      if (type === 'Zn') {
+        updateLiveStatusBanner('🫧 หย่อนสังกะสี (Zn) ลงในกรด HCl: เกิดฟองแก๊สไฮโดรเจน (H<sub>2</sub>) ผุดขึ้นปานกลาง');
+      } else {
+        updateLiveStatusBanner('🫧⚡ หย่อนแคลเซียม (Ca) ลงในกรด HCl: เกิดฟองแก๊สไฮโดรเจน (H<sub>2</sub>) ฟู่ขึ้นอย่างรุนแรง!');
+      }
+      renderPOEPanel();
+    }
+
+    function actionTestFlame2() {
+      if (!state.sim2.reactionActive) return;
+      audio.playPop();
+      state.sim2.flameTested = true;
+      state.sim2.flameTestTimer = 45;
+      spawnPopSparkles();
+      updateLiveStatusBanner('🔥 เสียงดัง "ป๊อป!" ที่ปากหลอดทดลอง ยืนยันการเกิดแก๊สไฮโดรเจน (H<sub>2</sub>)');
+      renderPOEPanel();
+    }
+
+    function resetSim2() {
+      audio.playClick();
+      state.sim2 = {
+        metalType: null,
+        metalY: 0,
+        metalRadius: 20,
+        reactionActive: false,
+        flameTested: false,
+        flameTestTimer: 0
+      };
+      particles = [];
+      updateLiveStatusBanner();
+      renderPOEPanel();
+    }
+
+    // --- ฐานที่ 3 Actions ---
+    function onRustDaySlide(val) {
+      state.sim3.day = parseFloat(val);
+      state.sim3.isPlaying = false;
+      updateRustStatusText();
+      // อัปเดตเฉพาะตัวเลขวันบน UI โดยไม่ทำลาย focus ของ slider
+      renderPOEPanel();
+    }
+
+    function toggleRustAutoPlay() {
+      audio.playClick();
+      if (state.sim3.day >= 14) {
+        state.sim3.day = 1;
+      }
+      state.sim3.isPlaying = !state.sim3.isPlaying;
+      renderPOEPanel();
+    }
+
+    function resetSim3() {
+      audio.playClick();
+      state.sim3.day = 1;
+      state.sim3.isPlaying = false;
+      updateRustStatusText();
+      renderPOEPanel();
+    }
+
+    function updateRustStatusText() {
+      const d = Math.round(state.sim3.day);
+      if (d < 4) {
+        updateLiveStatusBanner(`วันที่ ${d}: ตะปูเหล็กในหลอดที่ 1 เริ่มสัมผัสน้ำและออกซิเจน เริ่มมีคราบสีส้มจางๆ`);
+      } else if (d < 10) {
+        updateLiveStatusBanner(`วันที่ ${d}: หลอดที่ 1 เกิดสนิมเหล็กสีน้ำตาลแดงชัดเจน! ส่วนหลอดที่ 2 และ 3 ยังคงเงาวับ`);
+      } else {
+        updateLiveStatusBanner(`วันที่ ${d}: หลอดที่ 1 สนิมเกาะหนาเต็มตะปูเหล็ก! สรุปได้ว่าการเกิดสนิมต้องมีทั้ง "น้ำ" และ "ออกซิเจน"`);
+      }
+    }
+
+    // --- Modal สรุปผล ---
+    function openSummaryModal() {
+      audio.playSuccess();
+      updateHeaderUI();
+      const modal = document.getElementById('summary-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeSummaryModal() {
+      audio.playClick();
+      const modal = document.getElementById('summary-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function resetAllProgress() {
+      audio.playClick();
+      state.starsEarned = { 1: false, 2: false, 3: false };
+      state.selectedAnswers = { 1: null, 2: null, 3: null };
+      state.showHint = { 1: false, 2: false, 3: false };
+      resetSim1();
+      resetSim2();
+      resetSim3();
+      closeSummaryModal();
+      switchStation(1);
+    }
+
+    /*************************************************************************
+     * 7. ระบบวาดกราฟิกและแอนิเมชันบน HTML5 CANVAS (HIGH-DPI RENDERER)
+     *************************************************************************/
+    const canvas = document.getElementById('labCanvas');
+    const ctx = canvas.getContext('2d');
+    let canvasWidth = 800;
+    let canvasHeight = 550;
+
+    function resizeCanvas() {
+      const wrapper = document.getElementById('canvas-wrapper');
+      const rect = wrapper.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvasWidth = rect.width;
+      canvasHeight = rect.height;
+      canvas.width = canvasWidth * dpr;
+      canvas.height = canvasHeight * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+
+    // ฟังก์ชันสร้างอนุภาคระเบิดและประกายไฟ
+    function spawnExplosionParticles() {
+      const cx = canvasWidth * 0.5;
+      const cy = canvasHeight * 0.52;
+      for (let i = 0; i < 55; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 2 + Math.random() * 7;
+        particles.push({
+          type: 'spark',
+          x: cx,
+          y: cy,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed - 2,
+          radius: 4 + Math.random() * 6,
+          alpha: 1,
+          color: Math.random() > 0.4 ? '#fbbf24' : '#f97316'
+        });
+      }
+    }
+
+    function spawnPopSparkles() {
+      const cx = canvasWidth * 0.5;
+      const cy = canvasHeight * 0.24;
+      for (let i = 0; i < 35; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 1.5 + Math.random() * 5;
+        particles.push({
+          type: 'pop',
+          x: cx,
+          y: cy,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          radius: 3 + Math.random() * 5,
+          alpha: 1,
+          color: '#fde047'
+        });
+      }
+    }
+
+    // วาดพื้นหลังโต๊ะห้องปฏิบัติการวิทยาศาสตร์
+    function drawLabBackground() {
+      // เส้นตารางกริดห้องแล็บจางๆ
+      ctx.strokeStyle = 'rgba(148, 163, 184, 0.08)';
+      ctx.lineWidth = 1;
+      const gridSize = 40;
+      for (let x = 0; x < canvasWidth; x += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvasHeight);
+        ctx.stroke();
+      }
+      for (let y = 0; y < canvasHeight; y += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvasWidth, y);
+        ctx.stroke();
+      }
+
+      // พื้นโต๊ะปฏิบัติการด้านล่าง
+      const tableY = canvasHeight * 0.78;
+      const tableGrad = ctx.createLinearGradient(0, tableY, 0, canvasHeight);
+      tableGrad.addColorStop(0, '#334155');
+      tableGrad.addColorStop(0.15, '#1e293b');
+      tableGrad.addColorStop(1, '#090d16');
+      ctx.fillStyle = tableGrad;
+      ctx.fillRect(0, tableY, canvasWidth, canvasHeight - tableY);
+
+      // ขอบโต๊ะเรืองแสงจางๆ
+      ctx.fillStyle = '#475569';
+      ctx.fillRect(0, tableY, canvasWidth, 6);
+    }
+
+    // วาดป้ายชื่อสารเคมีขนาดใหญ่อ่านชัด
+    function drawChemicalLabel(text, subText, x, y, bgColor = 'rgba(15, 23, 42, 0.9)', borderColor = '#38bdf8') {
+      ctx.save();
+      ctx.font = '800 18px Sarabun, sans-serif';
+      const textWidth = ctx.measureText(text).width;
+      ctx.font = '700 14px Sarabun, sans-serif';
+      const subWidth = subText ? ctx.measureText(subText).width : 0;
+      const boxW = Math.max(textWidth, subWidth) + 28;
+      const boxH = subText ? 52 : 36;
+
+      ctx.fillStyle = bgColor;
+      ctx.strokeStyle = borderColor;
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.roundRect(x - boxW / 2, y - boxH / 2, boxW, boxH, 12);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font = '800 18px Sarabun, sans-serif';
+      ctx.fillText(text, x, subText ? y - 9 : y);
+
+      if (subText) {
+        ctx.fillStyle = '#7dd3fc';
+        ctx.font = '700 14px Sarabun, sans-serif';
+        ctx.fillText(subText, x, y + 12);
+      }
+      ctx.restore();
+    }
+
+    /*************************************************************************
+     * วาดฐานที่ 1: บีกเกอร์โลหะโซเดียม + น้ำ
+     *************************************************************************/
+    function renderStation1Canvas() {
+      const s = state.sim1;
+      const cx = canvasWidth * 0.5;
+      const tableY = canvasHeight * 0.78;
+      const beakerW = Math.min(260, canvasWidth * 0.44);
+      const beakerH = Math.min(270, canvasHeight * 0.46);
+      const bx = cx - beakerW / 2;
+      const by = tableY - beakerH;
+      const waterH = beakerH * 0.62;
+      const waterY = tableY - waterH;
+
+      // อัปเดตการเปลี่ยนสีฟีนอล์ฟทาลีน
+      if (s.phenolphthaleinAdded && s.solutionPinkLevel < 1) {
+        s.solutionPinkLevel = Math.min(1, s.solutionPinkLevel + 0.03);
+      }
+      if (s.litmusDipped && s.litmusBlueLevel < 1) {
+        s.litmusBlueLevel = Math.min(1, s.litmusBlueLevel + 0.03);
+      }
+
+      // 1. วาดสารละลายในบีกเกอร์ (สีฟ้าใส -> เปลี่ยนเป็นชมพูบานเย็นเมื่อหยดฟีนอล์ฟทาลีน)
+      const p = s.solutionPinkLevel;
+      const rCol = Math.round(56 + (236 - 56) * p);
+      const gCol = Math.round(189 + (72 - 189) * p);
+      const bCol = Math.round(248 + (153 - 248) * p);
+      const alpha = 0.35 + p * 0.45;
+
+      ctx.fillStyle = `rgba(${rCol}, ${gCol}, ${bCol}, ${alpha})`;
+      ctx.beginPath();
+      ctx.roundRect(bx + 6, waterY, beakerW - 12, waterH - 6, [0, 0, 18, 18]);
+      ctx.fill();
+
+      // ผิวน้ำด้านบน
+      ctx.fillStyle = `rgba(${rCol}, ${gCol}, ${bCol}, ${alpha + 0.2})`;
+      ctx.beginPath();
+      ctx.ellipse(cx, waterY, (beakerW - 12) / 2, 10, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 2. ก้อนโลหะโซเดียม (Na)
+      if (!s.sodiumDropped) {
+        // ลอยรอเหนือบีกเกอร์พร้อมลูกศรชี้
+        const floatY = by - 55 + Math.sin(Date.now() / 300) * 6;
+        ctx.fillStyle = '#cbd5e1';
+        ctx.strokeStyle = '#475569';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.roundRect(cx - 24, floatY - 18, 48, 36, 10);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#0f172a';
+        ctx.font = '800 18px Sarabun, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Na', cx, floatY + 6);
+
+        drawChemicalLabel('ก้อนโลหะโซเดียม (Na)', 'พร้อมหย่อนลงน้ำ', cx, floatY - 48, 'rgba(30, 41, 59, 0.95)', '#fbbf24');
+      } else if (s.sodiumRadius > 2) {
+        // วิ่งวนบนผิวน้ำและหดเล็กลงเรื่อยๆ
+        s.sodiumX += s.sodiumVx;
+        const maxOffset = beakerW * 0.32;
+        if (s.sodiumX > maxOffset || s.sodiumX < -maxOffset) {
+          s.sodiumVx *= -1;
+        }
+        s.sodiumRadius = Math.max(2, s.sodiumRadius - 0.045);
+
+        const curX = cx + s.sodiumX;
+        const curY = waterY;
+
+        // เปลวไฟสีเหลืองส้มรอบก้อนโซเดียม
+        const flameSize = s.sodiumRadius * (1.4 + Math.random() * 0.5);
+        const flameGrad = ctx.createRadialGradient(curX, curY - 10, 2, curX, curY - 14, flameSize * 1.6);
+        flameGrad.addColorStop(0, '#ffffff');
+        flameGrad.addColorStop(0.4, '#fde047');
+        flameGrad.addColorStop(0.8, 'rgba(249, 115, 22, 0.85)');
+        flameGrad.addColorStop(1, 'rgba(239, 68, 68, 0)');
+        ctx.fillStyle = flameGrad;
+        ctx.beginPath();
+        ctx.arc(curX, curY - 12, flameSize * 1.6, 0, Math.PI * 2);
+        ctx.fill();
+
+        // ก้อนโซเดียมที่กำลังหลอมเป็นทรงกลม
+        ctx.fillStyle = '#e2e8f0';
+        ctx.beginPath();
+        ctx.arc(curX, curY, s.sodiumRadius, 0, Math.PI * 2);
+        ctx.fill();
+
+        // ปล่อยฟองแก๊ส H2 ต่อเนื่อง
+        if (Math.random() < 0.7) {
+          particles.push({
+            type: 'bubble',
+            x: curX + (Math.random() - 0.5) * 20,
+            y: curY + 5,
+            vx: (Math.random() - 0.5) * 1.2,
+            vy: -1.5 - Math.random() * 2.5,
+            radius: 3 + Math.random() * 5,
+            alpha: 0.85,
+            color: '#ffffff'
+          });
+        }
+      }
+
+      // 3. กระดาษลิตมัส (ถ้าถูกจุ่ม)
+      if (s.litmusDipped) {
+        const stripX = bx + beakerW * 0.72;
+        const stripTopY = by - 35;
+        const stripBottomY = waterY + 65;
+
+        // ส่วนบน (ยังเป็นสีแดง)
+        ctx.fillStyle = '#ef4444';
+        ctx.fillRect(stripX, stripTopY, 18, waterY - stripTopY);
+
+        // ส่วนจุ่มในสารละลาย (เปลี่ยนจากแดงเป็นน้ำเงิน)
+        const bProg = s.litmusBlueLevel;
+        const lr = Math.round(239 + (37 - 239) * bProg);
+        const lg = Math.round(68 + (99 - 68) * bProg);
+        const lb = Math.round(68 + (235 - 68) * bProg);
+        ctx.fillStyle = `rgb(${lr}, ${lg}, ${lb})`;
+        ctx.fillRect(stripX, waterY, 18, stripBottomY - waterY);
+
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(stripX, stripTopY, 18, stripBottomY - stripTopY);
+
+        drawChemicalLabel('กระดาษลิตมัส', 'แดง ➔ น้ำเงิน (เบส)', stripX + 75, stripTopY + 10, 'rgba(30, 58, 138, 0.92)', '#60a5fa');
+      }
+
+      // 4. ตัวแก้วบีกเกอร์ใสและขีดบอกปริมาตร
+      ctx.strokeStyle = 'rgba(226, 232, 240, 0.85)';
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.moveTo(bx - 8, by);
+      ctx.lineTo(bx, by + 12);
+      ctx.lineTo(bx, tableY - 20);
+      ctx.quadraticCurveTo(bx, tableY, bx + 20, tableY);
+      ctx.lineTo(bx + beakerW - 20, tableY);
+      ctx.quadraticCurveTo(bx + beakerW, tableY, bx + beakerW, tableY - 20);
+      ctx.lineTo(bx + beakerW, by + 12);
+      ctx.lineTo(bx + beakerW + 8, by);
+      ctx.stroke();
+
+      // ขีดบอกระดับ mL บนบีกเกอร์
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
+      ctx.lineWidth = 2;
+      ctx.font = '700 13px Sarabun, sans-serif';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+      ctx.textAlign = 'left';
+      [100, 200, 300].forEach((ml, i) => {
+        const markY = tableY - (i + 1) * (beakerH * 0.23);
+        ctx.beginPath();
+        ctx.moveTo(bx + 14, markY);
+        ctx.lineTo(bx + 34, markY);
+        ctx.stroke();
+        ctx.fillText(`${ml} mL`, bx + 40, markY + 4);
+      });
+
+      // ป้ายบอกชนิดสารละลายด้านล่างบีกเกอร์
+      if (!s.sodiumDropped) {
+        drawChemicalLabel('น้ำ (H₂O)', 'ตัวทำละลายกลาง', cx, tableY - 40);
+      } else if (s.phenolphthaleinAdded) {
+        drawChemicalLabel('สารละลาย NaOH + ฟีนอล์ฟทาลีน', 'เปลี่ยนเป็นสีชมพู (เบส)', cx, tableY - 40, 'rgba(131, 24, 67, 0.92)', '#f472b6');
+      } else {
+        drawChemicalLabel('สารละลายโซเดียมไฮดรอกไซด์ (NaOH)', 'เกิดแก๊สไฮโดรเจน (H₂)', cx, tableY - 40);
+      }
+
+      // 5. เอฟเฟกต์ข้อความระเบิด & ทดสอบไฟ POP!
+      if (s.explosionTimer > 0) {
+        s.explosionTimer--;
+        ctx.save();
+        ctx.translate(cx, waterY - 45);
+        ctx.scale(1.1, 1.1);
+        ctx.fillStyle = '#ef4444';
+        ctx.strokeStyle = '#fde047';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.roundRect(-95, -26, 190, 52, 16);
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '800 24px Sarabun, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('💥 ระเบิดได้! 💥', 0, 8);
+        ctx.restore();
+      }
+
+      if (s.flameTestTimer > 0) {
+        s.flameTestTimer--;
+        ctx.save();
+        ctx.translate(cx, by - 25);
+        ctx.fillStyle = '#f97316';
+        ctx.strokeStyle = '#fef08a';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.roundRect(-85, -24, 170, 48, 16);
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '800 24px Sarabun, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('🔥 เสียง "ป๊อป!" (H₂)', 0, 8);
+        ctx.restore();
+      }
+    }
+
+    /*************************************************************************
+     * วาดฐานที่ 2: หลอดทดลองโลหะ + กรดไฮโดรคลอริก (HCl)
+     *************************************************************************/
+    function renderStation2Canvas() {
+      const s = state.sim2;
+      const cx = canvasWidth * 0.5;
+      const tableY = canvasHeight * 0.78;
+      const tubeW = 110;
+      const tubeH = Math.min(310, canvasHeight * 0.52);
+      const tx = cx - tubeW / 2;
+      const ty = tableY - tubeH - 25;
+      const acidH = tubeH * 0.65;
+      const acidY = ty + tubeH - acidH;
+
+      // 1. ขาตั้งและที่จับหลอดทดลอง (Clamp Stand)
+      ctx.fillStyle = '#475569';
+      ctx.fillRect(cx - 145, tableY - 14, 210, 14); // ฐานเหล็ก
+      ctx.fillStyle = '#94a3b8';
+      ctx.fillRect(cx - 115, ty - 20, 12, tubeH + 35); // เสาเหล็ก
+      ctx.fillStyle = '#64748b';
+      ctx.fillRect(cx - 115, ty + 45, 70, 14); // แขนจับหลอด
+
+      // 2. สารละลายกรดไฮโดรคลอริก (HCl) ในหลอดทดลอง
+      ctx.fillStyle = 'rgba(163, 230, 53, 0.28)';
+      ctx.beginPath();
+      ctx.moveTo(tx + 4, acidY);
+      ctx.lineTo(tx + tubeW - 4, acidY);
+      ctx.lineTo(tx + tubeW - 4, ty + tubeH - tubeW / 2);
+      ctx.arc(cx, ty + tubeH - tubeW / 2, (tubeW - 8) / 2, 0, Math.PI, false);
+      ctx.closePath();
+      ctx.fill();
+
+      // 3. โลหะที่หย่อนลงไป (Zn หรือ Ca)
+      if (s.reactionActive && s.metalType) {
+        const bottomY = ty + tubeH - 28;
+        if (s.metalY < bottomY) {
+          s.metalY += 7;
+        }
+        const curMetalY = Math.min(s.metalY, bottomY);
+        s.metalRadius = Math.max(5, s.metalRadius - (s.metalType === 'Ca' ? 0.035 : 0.015));
+
+        // วาดก้อนโลหะที่ก้นหลอด
+        ctx.fillStyle = s.metalType === 'Zn' ? '#94a3b8' : '#e2e8f0';
+        ctx.strokeStyle = '#334155';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.arc(cx - 10, curMetalY, s.metalRadius, 0, Math.PI * 2);
+        ctx.arc(cx + 12, curMetalY + 2, s.metalRadius * 0.85, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        // สร้างฟองแก๊ส H2 (แคลเซียมเกิดฟองเยอะและเร็วกว่าสังกะสีมาก)
+        const spawnChance = s.metalType === 'Ca' ? 0.95 : 0.45;
+        const count = s.metalType === 'Ca' ? 3 : 1;
+        if (curMetalY >= bottomY - 10 && Math.random() < spawnChance) {
+          for (let i = 0; i < count; i++) {
+            particles.push({
+              type: 'acidBubble',
+              x: cx + (Math.random() - 0.5) * (tubeW - 28),
+              y: bottomY - 5,
+              minY: acidY + 5,
+              vx: (Math.random() - 0.5) * 0.8,
+              vy: s.metalType === 'Ca' ? -3.5 - Math.random() * 2.5 : -1.8 - Math.random() * 1.5,
+              radius: s.metalType === 'Ca' ? 4 + Math.random() * 5 : 3 + Math.random() * 3.5,
+              alpha: 0.9,
+              color: '#ecfccb'
+            });
+          }
+        }
+      }
+
+      // 4. ตัวหลอดทดลองแก้ว
+      ctx.strokeStyle = 'rgba(241, 245, 249, 0.9)';
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.moveTo(tx - 6, ty);
+      ctx.lineTo(tx, ty + 8);
+      ctx.lineTo(tx, ty + tubeH - tubeW / 2);
+      ctx.arc(cx, ty + tubeH - tubeW / 2, tubeW / 2, Math.PI, 0, true);
+      ctx.lineTo(tx + tubeW, ty + 8);
+      ctx.lineTo(tx + tubeW + 6, ty);
+      ctx.stroke();
+
+      // ป้ายชื่อสารด้านข้างหลอดทดลอง
+      drawChemicalLabel('กรดไฮโดรคลอริก (HCl)', 'สารละลายกรด', cx + 145, acidY + 55, 'rgba(30, 41, 59, 0.92)', '#a3e635');
+
+      if (s.reactionActive) {
+        const saltName = s.metalType === 'Zn' ? 'ซิงค์คลอไรด์ (ZnCl₂)' : 'แคลเซียมคลอไรด์ (CaCl₂)';
+        drawChemicalLabel(`เกลือ: ${saltName}`, 'ปล่อยแก๊สไฮโดรเจน (H₂)', cx + 155, ty + tubeH - 35, 'rgba(6, 78, 59, 0.92)', '#34d399');
+      }
+
+      // เอฟเฟกต์ทดสอบไฟ POP!
+      if (s.flameTestTimer > 0) {
+        s.flameTestTimer--;
+        ctx.save();
+        ctx.translate(cx, ty - 30);
+        ctx.fillStyle = '#f97316';
+        ctx.strokeStyle = '#fef08a';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.roundRect(-85, -24, 170, 48, 16);
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '800 24px Sarabun, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('🔥 เสียง "ป๊อป!" (H₂)', 0, 8);
+        ctx.restore();
+      }
+    }
+
+    /*************************************************************************
+     * วาดฐานที่ 3: หลอดทดลอง 3 สภาวะเปรียบเทียบการเกิดสนิมเหล็ก
+     *************************************************************************/
+    function renderStation3Canvas() {
+      const s = state.sim3;
+      if (s.isPlaying) {
+        s.day += 0.04;
+        if (s.day >= 14) {
+          s.day = 14;
+          s.isPlaying = false;
+          renderPOEPanel();
+        }
+        updateRustStatusText();
+      }
+
+      const tableY = canvasHeight * 0.78;
+      const tubeW = Math.min(82, canvasWidth * 0.14);
+      const tubeH = Math.min(250, canvasHeight * 0.44);
+      const positions = [canvasWidth * 0.22, canvasWidth * 0.50, canvasWidth * 0.78];
+
+      // ป้ายแสดงวันที่ขนาดใหญ่ด้านบน
+      drawChemicalLabel(`เวลาที่ผ่านไป: วันที่ ${Math.round(s.day)} / 14`, 'สังเกตการเปลี่ยนแปลงของตะปูเหล็กทั้ง 3 หลอด', canvasWidth * 0.5, 42, 'rgba(30, 41, 59, 0.95)', '#f59e0b');
+
+      const rustProgress = (s.day - 1) / 13; // 0.0 -> 1.0
+
+      positions.forEach((cx, idx) => {
+        const tx = cx - tubeW / 2;
+        const ty = tableY - tubeH - 18;
+        const liquidH = tubeH * 0.55;
+        const liquidY = ty + tubeH - liquidH;
+
+        // 1. สิ่งที่บรรจุในแต่ละหลอด
+        if (idx === 0) {
+          // หลอดที่ 1: น้ำ + อากาศ (น้ำค่อยๆ เปลี่ยนเป็นสีส้มสนิมขุ่น)
+          const r = Math.round(56 + (180 - 56) * rustProgress);
+          const g = Math.round(189 + (83 - 189) * rustProgress);
+          const b = Math.round(248 + (9 - 248) * rustProgress);
+          ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${0.35 + rustProgress * 0.35})`;
+          ctx.beginPath();
+          ctx.moveTo(tx + 3, liquidY);
+          ctx.lineTo(tx + tubeW - 3, liquidY);
+          ctx.lineTo(tx + tubeW - 3, ty + tubeH - tubeW / 2);
+          ctx.arc(cx, ty + tubeH - tubeW / 2, (tubeW - 6) / 2, 0, Math.PI, false);
+          ctx.closePath();
+          ctx.fill();
+        } else if (idx === 1) {
+          // หลอดที่ 2: น้ำต้มสุกใส + ชั้นน้ำมันลอยทับด้านบน (ไม่มีออกซิเจน)
+          ctx.fillStyle = 'rgba(56, 189, 248, 0.32)';
+          ctx.beginPath();
+          ctx.moveTo(tx + 3, liquidY);
+          ctx.lineTo(tx + tubeW - 3, liquidY);
+          ctx.lineTo(tx + tubeW - 3, ty + tubeH - tubeW / 2);
+          ctx.arc(cx, ty + tubeH - tubeW / 2, (tubeW - 6) / 2, 0, Math.PI, false);
+          ctx.closePath();
+          ctx.fill();
+
+          // ชั้นน้ำมันสีเหลืองทองด้านบน
+          ctx.fillStyle = 'rgba(250, 204, 21, 0.85)';
+          ctx.fillRect(tx + 3, liquidY - 14, tubeW - 6, 14);
+        } else if (idx === 2) {
+          // หลอดที่ 3: สารดูดความชื้น (เม็ดซิลิกาเจลสีฟ้าที่ก้นหลอด)
+          ctx.fillStyle = '#38bdf8';
+          for (let k = 0; k < 14; k++) {
+            const gx = cx - 22 + (k % 5) * 11;
+            const gy = ty + tubeH - 18 - Math.floor(k / 5) * 10;
+            ctx.beginPath();
+            ctx.arc(gx, gy, 5.5, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+
+        // 2. วาดตะปูเหล็กเอียงอยู่ในหลอด
+        ctx.save();
+        ctx.translate(cx, ty + tubeH * 0.62);
+        ctx.rotate(-0.22);
+
+        // ตัวตะปูเหล็กเงา
+        ctx.fillStyle = '#cbd5e1';
+        ctx.strokeStyle = '#475569';
+        ctx.lineWidth = 2;
+        ctx.fillRect(-5, -55, 10, 105);
+        ctx.strokeRect(-5, -55, 10, 105);
+        // หัวตะปู
+        ctx.fillRect(-13, -61, 26, 7);
+        ctx.strokeRect(-13, -61, 26, 7);
+
+        // หากเป็นหลอดที่ 1 ให้วาดคราบสนิมสีน้ำตาลแดงเกาะตามเวลาที่ผ่านไป
+        if (idx === 0 && rustProgress > 0.05) {
+          ctx.fillStyle = `rgba(154, 52, 18, ${Math.min(0.95, rustProgress * 1.1)})`;
+          ctx.beginPath();
+          ctx.roundRect(-7, -35, 14, 85, 6);
+          ctx.fill();
+
+          // จุดสนิมขรุขระ
+          ctx.fillStyle = `rgba(124, 45, 18, ${rustProgress})`;
+          for (let rDot = 0; rDot < 12; rDot++) {
+            const ry = -30 + rDot * 7;
+            const rx = (rDot % 2 === 0 ? -4 : 4);
+            ctx.beginPath();
+            ctx.arc(rx, ry, 2.5 + rustProgress * 3, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+        ctx.restore();
+
+        // 3. จุกปิดปากหลอดสำหรับหลอดที่ 2 และ 3
+        if (idx === 1 || idx === 2) {
+          ctx.fillStyle = '#b45309';
+          ctx.beginPath();
+          ctx.roundRect(tx + 4, ty - 14, tubeW - 8, 22, 4);
+          ctx.fill();
+        }
+
+        // 4. ตัวแก้วหลอดทดลอง
+        ctx.strokeStyle = 'rgba(241, 245, 249, 0.9)';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(tx - 4, ty);
+        ctx.lineTo(tx, ty + 6);
+        ctx.lineTo(tx, ty + tubeH - tubeW / 2);
+        ctx.arc(cx, ty + tubeH - tubeW / 2, tubeW / 2, Math.PI, 0, true);
+        ctx.lineTo(tx + tubeW, ty + 6);
+        ctx.lineTo(tx + tubeW + 4, ty);
+        ctx.stroke();
+
+        // ป้ายกำกับใต้หลอดทดลอง
+        if (idx === 0) {
+          const status = rustProgress > 0.35 ? '⚠️ เกิดสนิมชัดเจน!' : 'น้ำ + อากาศ';
+          const border = rustProgress > 0.35 ? '#ef4444' : '#38bdf8';
+          drawChemicalLabel('หลอดที่ 1: น้ำ + อากาศ', status, cx, tableY + 34, 'rgba(15, 23, 42, 0.95)', border);
+        } else if (idx === 1) {
+          drawChemicalLabel('หลอดที่ 2: น้ำต้มสุก+น้ำมัน', 'ไม่มีออกซิเจน (ไม่เกิดสนิม)', cx, tableY + 34, 'rgba(15, 23, 42, 0.95)', '#22c55e');
+        } else {
+          drawChemicalLabel('หลอดที่ 3: สารดูดความชื้น', 'ไม่มีน้ำ/ความชื้น (ไม่เกิดสนิม)', cx, tableY + 34, 'rgba(15, 23, 42, 0.95)', '#22c55e');
+        }
+      });
+    }
+
+    // อัปเดตและวาดอนุภาค (ฟองแก๊ส / ประกายไฟ)
+    function updateAndDrawParticles() {
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.type === 'bubble') {
+          p.alpha -= 0.012;
+        } else if (p.type === 'acidBubble') {
+          if (p.y <= p.minY) {
+            p.alpha -= 0.08;
+          }
+        } else {
+          p.vy += 0.18; // แรงโน้มถ่วงสำหรับสะเก็ดไฟ
+          p.alpha -= 0.025;
+        }
+
+        if (p.alpha <= 0) {
+          particles.splice(i, 1);
+          continue;
+        }
+
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, p.alpha);
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    // ลูปหลักของแอนิเมชัน
+    function animateLab() {
+      ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+      drawLabBackground();
+
+      if (state.currentStation === 1) {
+        renderStation1Canvas();
+      } else if (state.currentStation === 2) {
+        renderStation2Canvas();
+      } else if (state.currentStation === 3) {
+        renderStation3Canvas();
+      }
+
+      updateAndDrawParticles();
+      requestAnimationFrame(animateLab);
+    }
+
+    // เริ่มต้นระบบเมื่อหน้าเว็บโหลดเสร็จสมบูรณ์
+    window.onload = function () {
+      resizeCanvas();
+      updateHeaderUI();
+      updateLiveStatusBanner();
+      renderPOEPanel();
+      animateLab();
+    };
+  </script>
+</body>
+</html>
